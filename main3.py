@@ -25,79 +25,87 @@ def resolutionAlgorithm(inputFile):
         print(str(line) + ". " + s + " {}")
         line += 1
     # Loop through KB looking for resolutions
-    i = 1;
-    for cL1 in kb:
-        j = 1;
-        for cL2 in kb:
-            result = checkResolvable(cL1, cL2,kb)
-            if result == "FALSE":
-                # FOUND CONTRADICTION
+    i = 1; j = 0
+    while i < len(kb):
+        while j < i:
+            result = resolveClauses(kb[i], kb[j])
+            if result != None and len(result) == 0:    # if result is empty, we found contradiction
                 print(str(line) + ". " + "Contradiction {"+str(i)+","+str(j)+"}")
-                return "Valid";
-            elif result != "" and result != None:
-                # Add resolution to KB
+                return "Valid"
+            elif result != None and result not in kb:
                 print(str(line) + ". ",clauseToString(result), " {"+str(i)+","+str(j)+"}")
                 kb.append(result)
                 line += 1
-            j += 1; # Increment J
-            if j >= i:
-                break;
-        i += 1; # Increment I
+            j += 1
+        i += 1
     return "Fail"
 
+
+
+    # i = 1;
+    # for cL1 in kb:
+    #     j = 1;
+    #     for cL2 in kb:
+    #         result = checkResolvable(cL1, cL2,kb)
+    #         if result == "FALSE":
+    #             # FOUND CONTRADICTION
+    #             print(str(line) + ". " + "Contradiction {"+str(i)+","+str(j)+"}")
+    #             return "Valid";
+    #         elif result != "" and result != None:
+    #             # Add resolution to KB
+    #             print(str(line) + ". ",clauseToString(result), " {"+str(i)+","+str(j)+"}")
+    #             kb.append(result)
+    #             line += 1
+    #         j += 1; # Increment J
+    #         if j >= i:
+    #             break;
+    #     i += 1; # Increment I
+    # return "Fail"
+
 def formatLine(line):
-    vars = []
-    v = ""
-    for c in line:
-        if c != ' ' and c != '\n':
-            v += c
-        else:
-            vars.append(v)
-            v = ""
-    if len(v) > 0:
-        vars.append(v)
+    vars = line.split()
     map = {}
     for var in vars:
-        if var.__contains__('~'):
-            var = var.replace('~', '')
-            map[var] = map.get(var, 0) - 1
+        if var.startswith('~'):
+            var = var.lstrip('~')
+            map[var] = -1
         else:
-            map[var] = map.get(var, 0) + 1
+            map[var] = 1
     return map;
 
-def checkResolvable(cL1,cL2,kb):
-    map = mergeClauses(cL1,cL2)
-    if len(map) == 1:
-        for k in map.keys():
-            if map.get(k) == 0:
-                return "FALSE"
-    else:
-        resolution = ""
-        needRes = 0
-        for var in map:
-            if map.get(var) > 0: # pos
-                if len(resolution) > 0:
-                    resolution += " "
-                resolution += var
-            elif map.get(var) < 0: # neg
-                if len(resolution) > 0:
-                    resolution += " "
-                resolution += ("~" + var)
-            else:
-                needRes += 1
-        for x in map.values():
-            if (x < -1) and (needRes != 1):
-                return '';
-            elif (x > 1) and (needRes != 1):
-                return '';
-        if needRes == 1:
-            resolution = formatLine(resolution);
-            if isDuplicate(resolution, kb) == False:
-                return resolution
-            else:
-                return ""
-        else:
-            return ""
+# def checkResolvable(cL1,cL2,kb):
+#     map = mergeClauses(cL1,cL2)
+#     if len(map) == 1:
+#         for k in map.keys():
+#             if map.get(k) == 0:
+#                 return "FALSE"
+#     else:
+#         resolution = ""
+#         needRes = 0
+#         for var in map:
+#             if map.get(var) > 0: # pos
+#                 if len(resolution) > 0:
+#                     resolution += " "
+#                 resolution += var
+#             elif map.get(var) < 0: # neg
+#                 if len(resolution) > 0:
+#                     resolution += " "
+#                 resolution += ("~" + var)
+#             else:
+#                 needRes += 1
+#         for x in map.values():
+#             if (x < -1) and (needRes != 1):
+#                 return '';
+#             elif (x > 1) and (needRes != 1):
+#                 return '';
+#         if needRes == 1:
+#             resolution = formatLine(resolution);
+#             if isDuplicate(resolution, kb) == False:
+#                 return resolution
+#             else:
+#                 return ""
+#         else:
+#             return ""
 
 def negateClause(kb, clause):
 
@@ -107,7 +115,7 @@ def negateClause(kb, clause):
         else:
             clause[v] = -1;
     for newClause in clause:
-        kb.append({newClause:clause.get(newClause)})
+        kb.append({newClause: clause.get(newClause)})
     return kb;
 
 def isDuplicate(res, kb):
@@ -116,12 +124,22 @@ def isDuplicate(res, kb):
             return True
     return False
 
-def mergeClauses(cL1,cL2):
+def resolveClauses(cL1,cL2):
+    hasPair = False
     map = {}
     for k in cL1.keys():
         map[k] = cL1[k];
     for k in cL2.keys():
-        map[k] = map.get(k, 0) + cL2[k];
+        if k in map:
+            # if k is negated in one clause but not in the other
+            if (map[k] + cL2[k]) == 0:
+                if (hasPair):   # if this is not the first complementary pair
+                    return None
+                else:           # if this is the first complementary pair
+                    hasPair = True
+                    del map[k]
+        else:
+            map[k] = cL2[k]
     return map
 
 def clauseToString(cL):
