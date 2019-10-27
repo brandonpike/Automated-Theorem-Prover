@@ -27,12 +27,12 @@ class KbClause:
     """
     Represents a clause in the knowledge base.
     """
-
-    def __init__(self, atoms, negAtoms, parents=()):
+    def __init__(self, atoms, negAtoms, clauseNumber, parents=()):
         self.atoms = frozenset(atoms)
         self.negAtoms = frozenset(negAtoms)
         self.atomOrder = tuple(atoms)
-        self.parents = parents
+        self.clauseNumber = clauseNumber
+        self.parents = tuple(parents)
 
     def __eq__(self, other):
         return self.atoms == other.atoms and self.negAtoms == other.negAtoms
@@ -42,24 +42,58 @@ class KbClause:
 
     def negate(self):
         result = []
+        clauseNum = self.clauseNumber
         for atom in self.atomOrder:
             if atom in self.negAtoms:
-                result.append(KbClause((atom), ()))
+                result.append(KbClause((atom), (), clauseNum))
             else:
-                result.append(KbClause((atom), (atom)))
+                result.append(KbClause((atom), (atom), clauseNum))
+            clauseNum += 1
         return result
 
-    def resolve(self, other):
-        # eliminate duplicate literals
-        intersect = self.literals.union(other.literals)
+    def resolve(self, other, clauseNumber):
+        nonNegAtoms1 = self.atoms.difference(self.negAtoms)
+        nonNegAtoms2 = other.atoms.difference(other.negAtoms)
+
+        # find atoms in complementary literals
+        intersect1 = nonNegAtoms1.intersection(other.negAtoms)
+        intersect2 = nonNegAtoms2.intersection(self.negAtoms)
+        complementAtoms = intersect1.union(intersect2)
+
+        # if there is not exactly 1 pair of complementary literals,
+        # do not resolve
+        if len(complementAtoms) != 1:
+            return None
+
+        # atoms in the resulting clause
+        atomUnion = self.atoms.union(other.atoms).difference(complementAtoms)
+        # order the atoms based on previous atom order
+        resultAtoms = []
+        for a in self.atomOrder:
+            if a in atomUnion:
+                resultAtoms.append(a)
+        for a in other.atomOrder:
+            if a in atomUnion and a not in resultAtoms:
+                resultAtoms.append(a)
+
+        # negated atoms in the resulting clause
+        negAtomUnion = self.negAtoms.union(other.negAtoms).difference(complementAtoms)
+
+        # return resulting clause
+        return KbClause(resultAtoms, negAtomUnion, clauseNumber, (self.clauseNumber, other.clauseNumber))
+
 
     def toString(self):
-        string = ""
+        string = f'{self.clauseNumber}. '
         for atom in self.atomOrder:
             if atom in self.negAtoms:
                 string += "~"
             string += atom
             string += " "
+        if self.parents:
+            string += "{{{0}, {1}}}".format(*self.parents)
+        else:
+            string += "{}"
         return string
 
 class KnowledgeBase:
@@ -90,9 +124,12 @@ def initializeKb(inputFile):
     kb = KnowledgeBase()
 
     file = open(inputFile, 'r')
+    lineNumber = 1
     for line in file:
         atoms, negAtoms = extractAtoms(line)
-        kb.addClause(KbClause(atoms, negAtoms))
+        kb.addClause(KbClause(atoms, negAtoms, lineNumber))
+        lineNumber += 1
+
     # remove clause to be negated
     testClauses = kb.pop().negate()
     # add negated clause(s) to kb
@@ -106,33 +143,30 @@ def main(args):
     kb = initializeKb(args[0])
 
     # Print what we've got so far
-    line = 1
-    for cL in kb.clauseOrder:
-        s = cL.toString()
-        print(str(line) + ". " + s + "{}")
-        line += 1
+    for clause in kb.clauseOrder:
+        print(clause.toString())
 
-    # resolutionAlgorithm(kb)
+    resolutionAlgorithm(kb)
     #print(dt.datetime.now() - time)
 
 
 def resolutionAlgorithm(kb):
 
     # Loop through KB looking for resolutions
+    line = len(kb.clauses) + 1
     i = 1
     while i < len(kb.clauses):
         j = 0
         while j < i:
-            result = resolveClauses(kb[i], kb[j])
+            result = kb.clauseOrder[i].resolve(kb.clauseOrder[j], line)
             # if result is empty, we found contradiction
-            if result != None and len(result) == 0:
-                print(str(line) + ". " +
-                      "Contradiction {"+str(i + 1)+","+str(j + 1)+"}")
-                return "Valid"
-            elif result != None and result not in kb:
-                print(str(line) + ". ", clauseToString(result),
-                      " {"+str(i + 1)+","+str(j + 1)+"}")
-                kb.append(result)
+            if result is not None and len(result.atoms) == 0:
+                print(str(line) + ". Contradiction {"+str(i + 1)+", "+str(j + 1)+"}")
+                print("Valid")
+                return 0
+            elif result is not None and result not in kb.clauses:
+                print(result.toString())
+                kb.addClause(result)
                 line += 1
             j += 1
         i += 1
