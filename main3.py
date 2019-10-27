@@ -45,9 +45,9 @@ class KbClause:
         clauseNum = self.clauseNumber
         for atom in self.atomOrder:
             if atom in self.negAtoms:
-                result.append(KbClause((atom), (), clauseNum))
+                result.append(KbClause((atom,), (), clauseNum))
             else:
-                result.append(KbClause((atom), (atom), clauseNum))
+                result.append(KbClause((atom,), (atom,), clauseNum))
             clauseNum += 1
         return result
 

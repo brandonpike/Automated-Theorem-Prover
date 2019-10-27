@@ -10,7 +10,7 @@
             "request": "launch",
             "program": "${file}",
             "console": "integratedTerminal",
-            "args": ["demo.in"]
+            "args": ["task6.in"]
         }
     ]
 }
