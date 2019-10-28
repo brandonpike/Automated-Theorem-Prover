@@ -14,13 +14,10 @@ each clause represents a disjunction of literals. The literals of each clause ar
 blank space, while negated variables are prefixed by ∼.
 
 Example Input File: test.kb
-∼p q
-
-∼z y
-
-p
-
-∼z y
+>> ∼p q
+>> ∼z y
+>> p
+>> ∼z y
 
 Example Output:
 1. ∼p q {}
