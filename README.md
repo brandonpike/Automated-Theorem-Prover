@@ -15,3 +15,4 @@ blank space, while negated variables are prefixed by ∼.
 q ~p z
 q ~p ~z
 ~z y ~p]
+there
