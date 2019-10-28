@@ -15,8 +15,11 @@ blank space, while negated variables are prefixed by ∼.
 
 Example Input File: test.kb
 ∼p q
+
 ∼z y
+
 p
+
 ∼z y
 
 Example Output:
