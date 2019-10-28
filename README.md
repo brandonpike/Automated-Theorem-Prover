@@ -9,9 +9,9 @@ while line n contains the (original) clause to test. Note that the KB is written
 each clause represents a disjunction of literals. The literals of each clause are separated by a
 blank space, while negated variables are prefixed by ∼.
 
-~p q
+[~p q
 ~z y
 ~q p
 q ~p z
 q ~p ~z
-~z y ~p
+~z y ~p]
