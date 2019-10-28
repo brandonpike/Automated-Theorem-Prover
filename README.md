@@ -13,7 +13,7 @@ while line n contains the (original) clause to test. Note that the KB is written
 each clause represents a disjunction of literals. The literals of each clause are separated by a
 blank space, while negated variables are prefixed by ∼.
 
-Example Input File: testkb
+Example Input File: test.kb
 
 ∼p q<br/>
 ∼z y<br/>
