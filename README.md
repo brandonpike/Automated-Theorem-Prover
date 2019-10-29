@@ -1,4 +1,4 @@
-# AI-KB_Resolution
+# Automated Theorem Prover
 
 # The point of the program
 This program takes a knowledge base represented in CNF and tries to prove a clause by contradiction. 
