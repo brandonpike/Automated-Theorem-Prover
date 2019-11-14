@@ -29,7 +29,7 @@ Example Output:
 6. q {3, 1}
 7. y {4, 2}
 8. ∼z {5, 2}
-6. Contradiction {7, 5}
+6. Contradiction {7, 5}<br/>
 Valid
 
 # The Resolution Principle
