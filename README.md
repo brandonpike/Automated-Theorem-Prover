@@ -6,7 +6,9 @@ b) This program takes a knowledge base represented in CNF and tries to prove a c
 We demonstrate the resolution principle listed at the bottom of this document.
 
 # How to run the program
-Commands: python main3.py <KB_File>
+Commands: 
+python prove.py options (gives you available proofs)
+python prove.py <filename.in> (prove theorem)
 
 The KB file must contain the initial KB and the clause whose validity we want to test. The
 input file contains n lines organized as follows: the first n − 1 lines describe the initial KB,
