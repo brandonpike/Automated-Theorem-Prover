@@ -6,7 +6,7 @@ b) This program takes a knowledge base represented in CNF and tries to prove a c
 We demonstrate the resolution principle listed at the bottom of this document.
 
 # How to run the program
-Commands: 
+Commands:<br/> 
 python prove.py options (gives you available proofs)<br/>
 python prove.py <filename.in> (prove theorem)
 
