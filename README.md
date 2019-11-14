@@ -7,7 +7,7 @@ We demonstrate the resolution principle listed at the bottom of this document.
 
 # How to run the program
 Commands: 
-python prove.py options (gives you available proofs)
+python prove.py options (gives you available proofs)<br/>
 python prove.py <filename.in> (prove theorem)
 
 The KB file must contain the initial KB and the clause whose validity we want to test. The
