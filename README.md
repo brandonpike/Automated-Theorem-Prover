@@ -1,6 +1,7 @@
 # Automated Theorem Prover
 
 # The point of the program
+a) demonstrating theorem proving with <b><u>no libraries imported</b></u>
 This program takes a knowledge base represented in CNF and tries to prove a clause by contradiction. 
 We demonstrate the resolution principle listed at the bottom of this document.
 
