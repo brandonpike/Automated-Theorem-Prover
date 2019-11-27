@@ -3,7 +3,7 @@
 # The point of the program
 a) Demonstrating theorem proving with <b>no libraries imported</b><br/>
 b) This program takes a knowledge base represented in CNF and tries to prove a clause by contradiction. 
-We demonstrate the resolution principle listed at the bottom of this document.
+I demonstrate the resolution principle listed at the bottom of this document.
 
 # How to run the program
 Commands:<br/> 
