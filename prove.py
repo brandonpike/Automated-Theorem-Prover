@@ -5,34 +5,43 @@ import sys
 
 def main(args):
     time = dt.datetime.now();
+    
     result = resolutionAlgorithm(args[0])
     print(result);
     runTime = dt.datetime.now() - time;
+    
     if result != "":
         print("~~~~~~~~~~~~~~~~~~~~\nCompleted in: ", runTime);
 
 def resolutionAlgorithm(inputFile):
+    
     if (inputFile == "options"):
         printProofDirectory();
         return "";
+    
     print("\n[Proving <"+inputFile+">]\n~~~~~~~~~~~~~~~~~~~~");
+    
+    # Get KB from file & Format it
     inputFile = "proofs/"+inputFile;
     kb = []
-    # Get KB from file & Format it
     file = open(inputFile, 'r')
     for line in file:
         kb.append(formatLine(line))
+        
     # Check KB and return if bad input
     if len(kb) == 0:
         return "File Format Incorrect";
+    
     # Pop clause to test & Negate it
     kb = negateClause (kb, kb.pop())
+    
     # Print what we've got so far
     line = 1;
     for cL in kb:
         s = clauseToString(cL)
         print(str(line) + ". " + s + " {}")
         line += 1
+        
     # Loop through KB looking for resolutions
     i = 1;
     for cL1 in kb:
@@ -52,6 +61,7 @@ def resolutionAlgorithm(inputFile):
             if j >= i:
                 break;
         i += 1; # Increment I
+        
     return "Fail"
 
 def formatLine(line):
@@ -109,7 +119,6 @@ def checkResolvable(cL1,cL2,kb):
             return ""
 
 def negateClause(kb, clause):
-
     for v in clause:
         if clause[v] == -1:
             clause[v] = 1;
